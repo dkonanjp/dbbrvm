@@ -53,7 +53,7 @@ compute_eod <- function(intraday_csv) {
 cat("=== Finalisation EOD BRVM ===\n")
 cat(sprintf("Date: %s\n\n", Sys.Date()))
 
-intraday_files <- list.files(INTRADAY_DIR, pattern = "\\.csv$", full.names = TRUE)
+intraday_files <- list.files(INTRADAY_DIR, pattern = "^[A-Z]+\\.csv$", full.names = TRUE)
 
 if (length(intraday_files) == 0) {
   cat("  Aucun snapshot intraday trouvé.\n")

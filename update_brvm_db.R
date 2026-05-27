@@ -12,10 +12,10 @@ suppressPackageStartupMessages({
   library(glue)
 })
 
-DATA_DIR <- file.path("data")
-INTRADAY_DIR <- file.path(DATA_DIR, "intraday")
+HISTORICAL_DIR <- file.path("dbhistorical")
+INTRADAY_DIR <- file.path("dbintraday")
 dir.create(INTRADAY_DIR, showWarnings = FALSE)
-LOG_FILE <- file.path(DATA_DIR, "_scrape_log.csv")
+LOG_FILE <- file.path(INTRADAY_DIR, "_scrape_log.csv")
 
 scrape_brvm <- function() {
   url <- "https://www.brvm.org/fr/cours-actions/liste"

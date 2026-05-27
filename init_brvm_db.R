@@ -10,8 +10,8 @@ suppressPackageStartupMessages({
   library(glue)
 })
 
-DATA_DIR <- file.path("data")
-dir.create(DATA_DIR, showWarnings = FALSE)
+HISTORICAL_DIR <- file.path("dbhistorical")
+dir.create(HISTORICAL_DIR, showWarnings = FALSE)
 
 TICKERS <- c(
   "NTLC", "PALC", "SPHC", "SICC", "STBC", "SOGC", "SLBC", "SCRC", "UNLC",
@@ -31,7 +31,7 @@ cat("=== Initialisation de la base BRVM CSV ===\n\n")
 total_rows <- 0
 for (ticker in TICKERS) {
   url <- glue("{BASE_URL}/{ticker}/{ticker}.daily.csv")
-  dest <- file.path(DATA_DIR, glue("{ticker}.csv"))
+  dest <- file.path(HISTORICAL_DIR, glue("{ticker}.csv"))
   
   cat(sprintf("[%s] Téléchargement... ", ticker))
   

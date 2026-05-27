@@ -12,8 +12,8 @@ suppressPackageStartupMessages({
   library(glue)
 })
 
-DATA_DIR <- file.path("data")
-INTRADAY_DIR <- file.path(DATA_DIR, "intraday")
+HISTORICAL_DIR <- file.path("dbhistorical")
+INTRADAY_DIR <- file.path("dbintraday")
 
 compute_eod <- function(intraday_csv) {
   df <- read_csv(intraday_csv, show_col_types = FALSE)
@@ -71,7 +71,7 @@ for (f in intraday_files) {
     next
   }
 
-  daily_file <- file.path(DATA_DIR, glue("{ticker}.csv"))
+  daily_file <- file.path(HISTORICAL_DIR, glue("{ticker}.csv"))
 
   if (file.exists(daily_file)) {
     existing <- read_csv(daily_file, show_col_types = FALSE)
@@ -89,4 +89,4 @@ for (f in intraday_files) {
   success <- success + 1
 }
 
-cat(sprintf("\n  %d tickers finalisés.\n", success))
+cat(sprintf("\n  %d tickers finalisés dans %s/\n", success, HISTORICAL_DIR))

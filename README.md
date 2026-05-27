@@ -1,6 +1,6 @@
 # BRVM Data Scraper
 
-Scraping automatisé des données boursières de la BRVM (Bourse Régionale des Valeurs Mobilières) avec stockage intraday 15-min et calcul OHLCV journalier.
+Scraping automatisé des données boursières de la BRVM avec deux bases distinctes.
 
 ## Architecture
 
@@ -14,9 +14,8 @@ Scraping automatisé des données boursières de la BRVM (Bourse Régionale des 
 │        GitHub Actions (toutes les 15 min)     │
 │         update_brvm_db.R                      │
 ├──────────────────────────────────────────────┤
-│              data/intraday/{TICKER}.csv        │ ◄── Snapshots 15-min
-│              (timestamp, ouverture, cloture,   │
-│               volume)                          │
+│              dbintraday/{TICKER}.csv           │ ◄── Snapshots 15-min
+│              (timestamp, cours, volume)        │
 └──────────────────────────────────────────────┘
                               │ 17:05 (clôture)
                               ▼
@@ -24,15 +23,15 @@ Scraping automatisé des données boursières de la BRVM (Bourse Régionale des 
 │            finalize_eod.R                     │
 │   Calcule Open/High/Low/Close/Volume          │
 ├──────────────────────────────────────────────┤
-│           data/{TICKER}.csv                    │ ◄── Base historique daily
+│           dbhistorical/{TICKER}.csv            │ ◄── Base historique daily
 │   (Date, Open, High, Low, Close, Volume,      │
 │    Ticker, source, updated_at)                 │
 └──────────────────────────────────────────────┘
 ```
 
-## Base de données
+## Bases de données
 
-### data/{TICKER}.csv — Historique daily (OHLCV)
+### `dbhistorical/{TICKER}.csv` — Historique daily OHLCV
 | Colonne | Description |
 |---|---|
 | Date | Date de la séance |
@@ -40,27 +39,27 @@ Scraping automatisé des données boursières de la BRVM (Bourse Régionale des 
 | High | Plus haut du jour |
 | Low | Plus bas du jour |
 | Close | Dernier cours |
-| Volume | Volume échangé |
+| Volume | Volume cumulé |
 | Ticker | Symbole (ex: SNTS) |
 | source | `github` (historique) ou `live` (calculé) |
 | updated_at | Dernière mise à jour |
 
-### data/intraday/{TICKER}.csv — Snapshots 15-min
+### `dbintraday/{TICKER}.csv` — Snapshots 15-min
 | Colonne | Description |
 |---|---|
 | Ticker | Symbole |
 | Date | Date du snapshot |
 | Timestamp | Heure exacte (YYYY-MM-DD HH:MM:SS) |
-| Cours_Ouverture | Prix d'ouverture au moment du snapshot |
-| Cours_Cloture | Dernier cours au moment du snapshot |
-| Volume | Volume cumulé |
+| Cours_Ouverture | Prix d'ouverture (inchangé sur la journée) |
+| Cours | Prix à l'instant T |
+| Volume_Cumule | Volume cumulé depuis l'ouverture |
 
 ## Workflows GitHub Actions
 
 | Workflow | Déclencheur | Action |
 |---|---|---|
-| `scrape-intraday.yml` | Lun-Ven 09:20→16:50 UTC */15 min | Scrape brvm.org → append dans `data/intraday/` |
-| `finalize-eod.yml` | Lun-Ven 17:05 UTC | Calcule OHLCV → complète `data/{TICKER}.csv` |
+| `scrape-intraday.yml` | Lun-Ven 09:20→16:50 UTC */15 min | Scrape brvm.org → append dans `dbintraday/` |
+| `finalize-eod.yml` | Lun-Ven 17:05 UTC | Calcule OHLCV → complète `dbhistorical/` |
 
 ## Scripts
 

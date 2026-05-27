@@ -2,7 +2,6 @@ name: Finalize EOD BRVM
 
 on:
   schedule:
-    # 17:05 UTC — 5 min après fermeture BRVM (17:00), le temps que les derniers snapshots soient commités
     - cron: '5 17 * * 1-5'
   workflow_dispatch:
 
@@ -15,17 +14,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: r-lib/actions/setup-r@v2
+      - uses: actions/setup-python@v5
         with:
-          r-version: '4.4'
+          python-version: '3.12'
 
-      - name: Install R packages
-        run: |
-          install.packages(c("rvest", "httr", "dplyr", "readr", "glue"))
-        shell: Rscript {0}
+      - name: Install Python packages
+        run: pip install -r requirements.txt
 
       - name: Run EOD finalization
-        run: Rscript finalize_eod.R
+        run: python finalize_eod.py
 
       - name: Commit and push
         run: |

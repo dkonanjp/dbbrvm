@@ -63,7 +63,7 @@ append_intraday <- function(df) {
     filepath <- file.path(INTRADAY_DIR, glue("{ticker}.csv"))
 
     snapshot <- df_ticker %>%
-      select(Ticker, Date, Timestamp, Cours_Ouverture, Cours_Cloture, Volume)
+      select(Ticker, Date, Timestamp, Cours_Ouverture, Cours = Cours_Cloture, Volume_Cumule = Volume)
 
     write_csv(snapshot, filepath, append = file.exists(filepath))
   }
@@ -98,7 +98,7 @@ tryCatch({
   success <- 0
   for (ticker in unique(df$Ticker)) {
     df_ticker <- df[df$Ticker == ticker, ]
-    cat(sprintf("  %-5s → Cours: %8.0f FCFA | Volume: %s\n",
+    cat(sprintf("  %-5s → Cours: %8.0f FCFA | Vol: %s\n",
                 ticker,
                 df_ticker$Cours_Cloture[1],
                 format(df_ticker$Volume[1], big.mark = ",")))

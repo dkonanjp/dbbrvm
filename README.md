@@ -1,8 +1,6 @@
 # BRVM Data Scraper
 
-Scraping automatisé des données boursières de la BRVM avec deux bases distinctes.
-
-Converti de R vers Python.
+Scraping automatisé des données boursières de la BRVM.
 
 ## Architecture
 
@@ -38,6 +36,21 @@ Converti de R vers Python.
 | `update_brvm_db.py` | `python update_brvm_db.py` | Snapshot 15-min (GH Actions) |
 | `finalize_eod.py` | `python finalize_eod.py` | Calcul OHLCV de clôture |
 | `init_brvm_db.py` | `python init_brvm_db.py` | Import historique depuis GitHub (one-time) |
+
+## Nouvelles sociétés
+
+Les nouvelles cotations sont automatiquement détectées :
+- `update_brvm_db.py` scrape dynamiquement le tableau BRVM sans liste figée
+- `finalize_eod.py` traite tous les fichiers présents dans `dbintraday/`
+- Le fichier historique du nouveau ticker est créé automatiquement au premier EOD
+
+## Robustesse
+
+- **Parsing HTML** : détection intelligente du tableau des actions (par validation du format ticker)
+- **Validation** : regex `^[A-Z]{2,5}$` sur chaque ticker, cours non numériques loggés
+- **Seuil minimum** : 3 snapshots requis avant calcul EOD (évite les OHLCV à plat)
+- **Retry** : backoff exponentiel sur erreur 429
+- **Alerte** : création automatique d'une Issue GitHub en cas d'échec d'un workflow
 
 ## Installation
 

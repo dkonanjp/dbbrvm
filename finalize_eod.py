@@ -5,11 +5,17 @@ from datetime import datetime
 HISTORICAL_DIR = Path("dbhistorical")
 INTRADAY_DIR = Path("dbintraday")
 
+MIN_SNAPSHOTS = 3
+
 
 def compute_eod(intraday_csv: Path):
     df = pd.read_csv(intraday_csv)
 
     if df.empty:
+        return None
+
+    if len(df) < MIN_SNAPSHOTS:
+        print(f"  {intraday_csv.name}: {len(df)} snapshot(s) insuffisant(s) (min {MIN_SNAPSHOTS}), ignoré")
         return None
 
     tickers = df["Ticker"].unique()

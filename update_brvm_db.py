@@ -1,3 +1,4 @@
+import re
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -18,6 +19,8 @@ USER_AGENTS = [
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15",
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:137.0) Gecko/20100101 Firefox/137.0",
 ]
+
+TICKER_RE = re.compile(r'^[A-Z]{2,5}$')
 
 
 def request_with_retry(url, max_attempts=3):
@@ -60,27 +63,45 @@ def scrape_brvm():
 
     soup = BeautifulSoup(resp.text, "html.parser")
     tables = soup.find_all("table")
-    if len(tables) < 4:
-        raise RuntimeError("Tableau 4 introuvable — la structure HTML a peut-être changé")
 
-    stock_table = tables[3]
+    stock_table = None
+    for table in tables:
+        first_row = table.find("tr")
+        if not first_row:
+            continue
+        first_cell = first_row.find("td")
+        if first_cell and TICKER_RE.match(first_cell.get_text(strip=True)):
+            stock_table = table
+            break
+    if stock_table is None:
+        raise RuntimeError("Tableau des actions introuvable — la structure HTML a peut-être changé")
+
     rows = stock_table.find_all("tr")
 
     scrape_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     scrape_date = datetime.now().date()
 
     records = []
+    skipped = []
     for row in rows[1:]:
         cells = row.find_all("td")
         if len(cells) < 7:
+            skipped.append((row, "moins de 7 colonnes"))
+            continue
+
+        ticker = cells[0].get_text(strip=True)
+        if not TICKER_RE.match(ticker):
+            skipped.append((row, f"ticker invalide: '{ticker}'"))
             continue
 
         cours_cloture_str = cells[5].get_text(strip=True).replace(" ", "")
         try:
             cours_cloture = float(cours_cloture_str)
         except ValueError:
+            skipped.append((row, f"cours clôture non numérique: '{cours_cloture_str}'"))
             continue
         if cours_cloture == 0:
+            skipped.append((row, "cours clôture = 0"))
             continue
 
         volume_str = cells[2].get_text(strip=True).replace(" ", "")
@@ -90,7 +111,7 @@ def scrape_brvm():
 
         records.append(
             {
-                "Ticker": cells[0].get_text(strip=True),
+                "Ticker": ticker,
                 "Nom": cells[1].get_text(strip=True),
                 "Volume": float(volume_str) if volume_str else 0,
                 "Cours_Veille": float(cours_veille_str) if cours_veille_str else 0,
@@ -101,6 +122,10 @@ def scrape_brvm():
                 "Timestamp": scrape_time,
             }
         )
+
+    if skipped:
+        for row, reason in skipped:
+            print(f"  Ligne ignorée: {reason}")
 
     if not records:
         raise RuntimeError("Aucune donnée valide extraite")

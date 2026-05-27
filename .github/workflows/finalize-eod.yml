@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      issues: write
 
     steps:
       - uses: actions/checkout@v4
@@ -31,3 +32,15 @@ jobs:
           git add dbhistorical/ dbintraday/ logs/
           git diff --staged --quiet || git commit -m "eod $(date -u '+%Y-%m-%d')"
           git push
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `EOD échoué – ${{ github.run_id }}`,
+              body: `La finalisation EOD BRVM du $(date -u '+%Y-%m-%d') a échoué.\n\nRun: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`
+            })

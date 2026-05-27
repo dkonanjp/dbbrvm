@@ -1,0 +1,36 @@
+name: Finalize EOD BRVM
+
+on:
+  schedule:
+    # 17:05 UTC — 5 min après fermeture BRVM (17:00), le temps que les derniers snapshots soient commités
+    - cron: '5 17 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.4'
+
+      - name: Install R packages
+        run: |
+          install.packages(c("rvest", "httr", "dplyr", "readr", "glue"))
+        shell: Rscript {0}
+
+      - name: Run EOD finalization
+        run: Rscript finalize_eod.R
+
+      - name: Commit and push
+        run: |
+          git config user.name "brvm-bot"
+          git config user.email "brvm-bot@users.noreply.github.com"
+          git add data/ data/intraday/ data/_scrape_log.csv
+          git diff --staged --quiet || git commit -m "eod $(date -u '+%Y-%m-%d')"
+          git push

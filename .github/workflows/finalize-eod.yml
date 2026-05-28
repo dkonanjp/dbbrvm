@@ -2,7 +2,7 @@ name: Finalize EOD BRVM
 
 on:
   schedule:
-    - cron: '5 17 * * 1-5'
+    - cron: '5 16 * * 1-5'
   workflow_dispatch:
 
 jobs:

@@ -70,14 +70,15 @@ def main():
 
         if daily_file.exists():
             existing = pd.read_csv(daily_file)
-            existing = existing[existing["Date"] != str(eod["Date"])]
+            existing["Date"] = pd.to_datetime(existing["Date"]).dt.date
+            existing = existing[existing["Date"] != eod["Date"]]
             eod_df = pd.DataFrame([eod])
             combined = pd.concat([existing, eod_df], ignore_index=True)
             combined = combined.sort_values("Date")
         else:
             combined = pd.DataFrame([eod])
 
-        combined.to_csv(daily_file, index=False)
+        combined.to_csv(daily_file, index=False, float_format="%.0f")
 
         print(
             f"O:{eod['Open']:.0f} H:{eod['High']:.0f} L:{eod['Low']:.0f} C:{eod['Close']:.0f} V:{eod['Volume']:,.0f}"

@@ -6,6 +6,9 @@ from pathlib import Path
 from datetime import datetime
 import time
 import random
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 HISTORICAL_DIR = Path("dbhistorical")
 INTRADAY_DIR = Path("dbintraday")
@@ -35,6 +38,7 @@ def request_with_retry(url, max_attempts=3):
                     "Accept": "text/html,application/xhtml+xml",
                     "Referer": "https://www.brvm.org/fr/",
                 },
+                verify=False,
                 timeout=30,
             )
             if resp.status_code == 200:
@@ -65,14 +69,17 @@ def scrape_brvm():
     tables = soup.find_all("table")
 
     stock_table = None
+    best_count = 0
     for table in tables:
-        first_row = table.find("tr")
-        if not first_row:
-            continue
-        first_cell = first_row.find("td")
-        if first_cell and TICKER_RE.match(first_cell.get_text(strip=True)):
+        rows = table.find_all("tr")
+        count = 0
+        for row in rows:
+            cells = row.find_all("td")
+            if len(cells) >= 7 and TICKER_RE.match(cells[0].get_text(strip=True)):
+                count += 1
+        if count > best_count:
+            best_count = count
             stock_table = table
-            break
     if stock_table is None:
         raise RuntimeError("Tableau des actions introuvable — la structure HTML a peut-être changé")
 

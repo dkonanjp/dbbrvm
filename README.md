@@ -1,6 +1,6 @@
 # BRVM Data Scraper
 
-Scraping automatisé des données boursières de la BRVM.
+Scraping automatisé des données boursières de la BRVM via GitHub Actions.
 
 ## Architecture
 
@@ -11,13 +11,14 @@ Scraping automatisé des données boursières de la BRVM.
                               │ GET /cours-actions/liste
                               ▼
 ┌──────────────────────────────────────────────┐
-│       GitHub Actions (toutes les 15 min)     │
+│     GitHub Actions (toutes les 15 min)      │
+│         09:05 → 15:50 UTC (lun-ven)         │
 │         update_brvm_db.py                    │
 ├──────────────────────────────────────────────┤
 │              dbintraday/{TICKER}.csv          │ ◄── Snapshots 15-min
 │              (timestamp, cours, volume)       │
 └──────────────────────────────────────────────┘
-                              │ 17:05 (clôture)
+                              │ 16:05 (EOD)
                               ▼
 ┌──────────────────────────────────────────────┐
 │            finalize_eod.py                   │
@@ -29,6 +30,20 @@ Scraping automatisé des données boursières de la BRVM.
 └──────────────────────────────────────────────┘
 ```
 
+## Horaires de cotation BRVM (UTC)
+
+| Phase | Horaire |
+|---|---|
+| Pré-ouverture | 09:00 → 09:45 |
+| Fixing d'ouverture | 09:45 |
+| Négociation continue | 09:45 → 14:00 |
+| Pré-clôture | 14:00 → 14:30 |
+| Fixing de clôture | 14:30 |
+| Dernier cours | 14:30 → 15:00 |
+| Clôture officielle | **15:00** |
+
+Les snapshots couvrent 09:05 → 15:50. L'EOD est calculé à 16:05.
+
 ## Scripts
 
 | Script | Usage | Rôle |
@@ -37,19 +52,27 @@ Scraping automatisé des données boursières de la BRVM.
 | `finalize_eod.py` | `python finalize_eod.py` | Calcul OHLCV de clôture |
 | `init_brvm_db.py` | `python init_brvm_db.py` | Import historique depuis GitHub (one-time) |
 
-## Nouvelles sociétés
+## Workflows GitHub Actions
 
-Les nouvelles cotations sont automatiquement détectées :
-- `update_brvm_db.py` scrape dynamiquement le tableau BRVM sans liste figée
-- `finalize_eod.py` traite tous les fichiers présents dans `dbintraday/`
-- Le fichier historique du nouveau ticker est créé automatiquement au premier EOD
+| Workflow | Déclencheur | Fichier |
+|---|---|---|
+| Scrape BRVM Intraday | `5,20,35,50 9-15 * * 1-5` | `.github/workflows/scrape-intraday.yml` |
+| Finalize EOD BRVM | `5 16 * * 1-5` | `.github/workflows/finalize-eod.yml` |
+
+## Base de données
+
+- **47 tickers** couvrant la période **16 sept 1998 → aujourd'hui**
+- **154 000+ lignes** de données OHLCV quotidiennes
+- Source historique : `github` (import initial), source temps réel : `live` (snapshots)
+- Données stockées en CSV dans `dbhistorical/` et `dbintraday/`
 
 ## Robustesse
 
-- **Parsing HTML** : détection intelligente du tableau des actions (par validation du format ticker)
+- **Parsing HTML** : détection du tableau par comptage de lignes valides (7 colonnes + ticker), résistant aux changements de structure `<th>`/`<td>`
+- **SSL** : `verify=False` (le certificat du site BRVM n'est pas reconnu par les CA standards)
 - **Validation** : regex `^[A-Z]{2,5}$` sur chaque ticker, cours non numériques loggés
 - **Seuil minimum** : 3 snapshots requis avant calcul EOD (évite les OHLCV à plat)
-- **Retry** : backoff exponentiel sur erreur 429
+- **Retry** : backoff exponentiel sur erreur 429, 3 tentatives max
 - **Alerte** : création automatique d'une Issue GitHub en cas d'échec d'un workflow
 
 ## Installation

@@ -50,8 +50,8 @@ def request_with_retry(url, max_attempts=3):
                 )
                 time.sleep(wait)
                 continue
-        except requests.RequestException:
-            pass
+        except requests.RequestException as e:
+            print(f"  Tentative {attempt}/{max_attempts} — {e}")
         if attempt < max_attempts:
             print(f"  Tentative {attempt}/{max_attempts} échouée, nouvelle tentative...")
             time.sleep(5)

@@ -14,22 +14,19 @@ def compute_eod(intraday_csv: Path):
     if df.empty:
         return None
 
-    if len(df) < MIN_SNAPSHOTS:
-        print(f"  {intraday_csv.name}: {len(df)} snapshot(s) insuffisant(s) (min {MIN_SNAPSHOTS}), ignoré")
-        return None
-
     tickers = df["Ticker"].unique()
     if len(tickers) != 1:
         print(f"  {intraday_csv.name}: tickers multiples, ignoré")
         return None
 
-    dates = df["Date"].unique()
-    if len(dates) != 1:
-        print(f"  {intraday_csv.name}: dates multiples, ignoré")
+    today = df["Date"].max()
+    df = df[df["Date"] == today]
+
+    if len(df) < MIN_SNAPSHOTS:
+        print(f"  {intraday_csv.name}: {len(df)} snapshot(s) pour {today} insuffisant(s) (min {MIN_SNAPSHOTS}), ignoré")
         return None
 
     ticker = tickers[0]
-    today = dates[0]
     df = df.sort_values("Timestamp")
 
     eod = {

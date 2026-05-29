@@ -71,7 +71,7 @@ def main():
             existing = existing[existing["Date"] != eod["Date"]]
             eod_df = pd.DataFrame([eod])
             combined = pd.concat([existing, eod_df], ignore_index=True)
-            combined = combined.sort_values("Date")
+            combined = combined.sort_values("Date", ascending=False)
         else:
             combined = pd.DataFrame([eod])
 

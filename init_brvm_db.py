@@ -1,6 +1,16 @@
+import sys
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
+
+print("⚠️  ATTENTION: Ce script a été utilisé une seule fois pour initialiser la base historique.")
+print("    Il ne doit PLUS être exécuté. Les données historiques sont désormais alimentées")
+print("    exclusivement par finalize_eod.py à partir des snapshots dbintraday/.")
+print()
+rep = input("Toujours exécuter ? (oui/non) : ").strip().lower()
+if rep != "oui":
+    print("Abandon.")
+    sys.exit(0)
 
 HISTORICAL_DIR = Path("dbhistorical")
 HISTORICAL_DIR.mkdir(exist_ok=True)

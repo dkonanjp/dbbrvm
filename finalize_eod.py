@@ -2,6 +2,8 @@ import pandas as pd
 from pathlib import Path
 from datetime import datetime, timezone
 
+# dbhistorical/ est alimenté EXCLUSIVEMENT par ce script à partir de dbintraday/.
+# Ne jamais introduire de source externe (init_brvm_db.py est obsolète).
 HISTORICAL_DIR = Path("dbhistorical")
 INTRADAY_DIR = Path("dbintraday")
 

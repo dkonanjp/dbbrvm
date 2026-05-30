@@ -12,13 +12,13 @@ Scraping automatisé des données boursières de la BRVM via GitHub Actions.
                               ▼
 ┌──────────────────────────────────────────────┐
 │     GitHub Actions (toutes les 15 min)      │
-│         09:05 → 15:50 UTC (lun-ven)         │
+│         09:50 → 15:05 UTC (lun-ven)         │
 │         update_brvm_db.py                    │
 ├──────────────────────────────────────────────┤
 │              dbintraday/{TICKER}.csv          │ ◄── Snapshots 15-min
 │              (timestamp, cours, volume)       │
 └──────────────────────────────────────────────┘
-                              │ 16:05 (EOD)
+                              │ 15:10 (EOD)
                               ▼
 ┌──────────────────────────────────────────────┐
 │            finalize_eod.py                   │
@@ -29,6 +29,8 @@ Scraping automatisé des données boursières de la BRVM via GitHub Actions.
 │    Ticker, source, updated_at)               │
 └──────────────────────────────────────────────┘
 ```
+
+> **Règle fondamentale** : `dbhistorical/` est alimenté **uniquement** par `finalize_eod.py` à partir de `dbintraday/`. Aucune source externe n'est utilisée.
 
 ## Horaires de cotation BRVM (UTC)
 
@@ -50,7 +52,7 @@ Le cron est `5,20,35,50 9-15 * * 1-5`. Le code ignore les runs avant 09:50 et ap
 |---|---|---|
 | `update_brvm_db.py` | `python update_brvm_db.py` | Snapshot 15-min (GH Actions) |
 | `finalize_eod.py` | `python finalize_eod.py` | Calcul OHLCV de clôture |
-| `init_brvm_db.py` | `python init_brvm_db.py` | Import historique depuis GitHub (one-time) |
+| ~~`init_brvm_db.py`~~ | ⚠️ Obsolète | Bootstrap historique (one-time, ne plus exécuter) |
 
 ## Workflows GitHub Actions
 
@@ -63,8 +65,9 @@ Le cron est `5,20,35,50 9-15 * * 1-5`. Le code ignore les runs avant 09:50 et ap
 
 - **47 tickers** couvrant la période **16 sept 1998 → aujourd'hui**
 - **154 000+ lignes** de données OHLCV quotidiennes
-- Source historique : `github` (import initial), source temps réel : `live` (snapshots)
-- Données stockées en CSV dans `dbhistorical/` et `dbintraday/`
+- `dbhistorical/` : alimenté **uniquement** par `finalize_eod.py` (source = `live`)
+- `dbintraday/` : snapshots 15-min bruts, source unique de vérité
+- `init_brvm_db.py` obsolète : le bootstrap initial (source = `github`) ne sera plus réexécuté
 
 ## Robustesse
 
@@ -84,9 +87,6 @@ pip install -r requirements.txt
 ## Exécution locale
 
 ```bash
-# Initialiser la base historique (47 tickers depuis 1998)
-python init_brvm_db.py
-
 # Lancer un snapshot manuel
 python update_brvm_db.py
 

@@ -42,7 +42,7 @@ Scraping automatisé des données boursières de la BRVM via GitHub Actions.
 | Dernier cours | 14:30 → 15:00 |
 | Clôture officielle | **15:00** |
 
-Les snapshots couvrent 09:05 → 15:50. L'EOD est calculé à 16:05.
+Le cron est `5,20,35,50 9-15 * * 1-5`. Le code ignore les runs avant 09:50 et après 15:05. L'EOD est calculé à 15:10 (juste après la clôture à 15:00).
 
 ## Scripts
 
@@ -57,7 +57,7 @@ Les snapshots couvrent 09:05 → 15:50. L'EOD est calculé à 16:05.
 | Workflow | Déclencheur | Fichier |
 |---|---|---|
 | Scrape BRVM Intraday | `5,20,35,50 9-15 * * 1-5` | `.github/workflows/scrape-intraday.yml` |
-| Finalize EOD BRVM | `5 16 * * 1-5` | `.github/workflows/finalize-eod.yml` |
+| Finalize EOD BRVM | `10 15 * * 1-5` | `.github/workflows/finalize-eod.yml` |
 
 ## Base de données
 

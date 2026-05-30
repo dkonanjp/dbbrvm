@@ -40,7 +40,7 @@ Paramètres :
 | | `Content-Type: application/json` |
 | | `Accept: application/vnd.github.v3+json` |
 | **Request Body** | `{"ref":"main"}` |
-| **Schedule** | `5,20,35,50 9-15 * * 1-5` |
+| **Schedule** | `5,20,35,50 9-15 * * 1-5` (le code ignore avant 09:50 et après 15:05) |
 | **Timezone** | `UTC` |
 
 #### 4. Activer le cron

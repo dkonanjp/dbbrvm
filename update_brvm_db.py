@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 import time
 import random
 import urllib3
@@ -169,7 +169,24 @@ def log_scrape(success_count, error_count, scrape_time):
     log_entry.to_csv(LOG_FILE, mode="a", header=not LOG_FILE.exists(), index=False)
 
 
+FIRST_SNAPSHOT_HOUR = 9
+FIRST_SNAPSHOT_MIN = 50
+LAST_SNAPSHOT_HOUR = 15
+LAST_SNAPSHOT_MIN = 5
+
+
 def main():
+    now_utc = datetime.now(timezone.utc)
+    before_open = now_utc.hour < FIRST_SNAPSHOT_HOUR or (
+        now_utc.hour == FIRST_SNAPSHOT_HOUR and now_utc.minute < FIRST_SNAPSHOT_MIN
+    )
+    after_close = now_utc.hour > LAST_SNAPSHOT_HOUR or (
+        now_utc.hour == LAST_SNAPSHOT_HOUR and now_utc.minute > LAST_SNAPSHOT_MIN
+    )
+    if before_open or after_close:
+        print(f"  Hors horaire de cotation ({FIRST_SNAPSHOT_HOUR}:{FIRST_SNAPSHOT_MIN:02d} → {LAST_SNAPSHOT_HOUR}:{LAST_SNAPSHOT_MIN:02d} UTC). Snapshot ignoré.")
+        return
+
     print("=== Snapshot BRVM ===")
     print(f"Date: {datetime.now().date()}\n")
 

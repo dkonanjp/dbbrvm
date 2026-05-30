@@ -1,11 +1,25 @@
 import pandas as pd
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 
 HISTORICAL_DIR = Path("dbhistorical")
 INTRADAY_DIR = Path("dbintraday")
 
+FIRST_SNAPSHOT_HOUR = 9
+FIRST_SNAPSHOT_MIN = 50
 MIN_SNAPSHOTS = 3
+
+
+def _after_market_open(ts: str) -> bool:
+    try:
+        t = datetime.fromisoformat(ts)
+        if t.tzinfo is None:
+            t = t.replace(tzinfo=timezone.utc)
+        return t.hour > FIRST_SNAPSHOT_HOUR or (
+            t.hour == FIRST_SNAPSHOT_HOUR and t.minute >= FIRST_SNAPSHOT_MIN
+        )
+    except Exception:
+        return True
 
 
 def compute_eod(intraday_csv: Path):
@@ -21,6 +35,8 @@ def compute_eod(intraday_csv: Path):
 
     today = df["Date"].max()
     df = df[df["Date"] == today]
+
+    df = df[df["Timestamp"].apply(_after_market_open)]
 
     if len(df) < MIN_SNAPSHOTS:
         print(f"  {intraday_csv.name}: {len(df)} snapshot(s) pour {today} insuffisant(s) (min {MIN_SNAPSHOTS}), ignoré")

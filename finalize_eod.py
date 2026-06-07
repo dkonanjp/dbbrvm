@@ -49,7 +49,7 @@ def compute_eod(intraday_csv: Path):
 
     eod = {
         "Date": pd.to_datetime(today).date(),
-        "Open": df["Cours_Ouverture"].iloc[0],
+        "Open": next((v for v in df["Cours_Ouverture"] if v > 0), df["Cours"].iloc[0]),
         "High": df["Cours"].max(),
         "Low": df["Cours"].min(),
         "Close": df["Cours"].iloc[-1],

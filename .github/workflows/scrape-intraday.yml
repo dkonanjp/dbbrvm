@@ -30,11 +30,15 @@ jobs:
           git config user.name "brvm-bot"
           git config user.email "brvm-bot@users.noreply.github.com"
           for d in dbintraday logs; do [ -d "$d" ] && git add "$d"; done
-          git diff --staged --quiet && exit 0
+          git diff --staged --quiet && echo "Rien à committer" && exit 0
           git commit -m "snapshot $(date -u '+%Y-%m-%d %H:%M') UTC"
-          for i in 1 2 3; do
-            git pull --rebase --autostash && git push && break
-            sleep 3
+          for i in 1 2 3 4 5; do
+            if git pull --rebase --autostash && git push; then
+              echo "Push réussi"
+              break
+            fi
+            echo "Push échoué, tentative $i/5"
+            sleep $((5 * i))
           done
 
       - name: Notify on failure

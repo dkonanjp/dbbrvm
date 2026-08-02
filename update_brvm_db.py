@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 import time
 import random
 import urllib3
+import json
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -26,7 +27,7 @@ USER_AGENTS = [
 TICKER_RE = re.compile(r'^[A-Z]{2,5}$')
 
 
-def request_with_retry(url, max_attempts=3):
+def request_with_retry(url, max_attempts=7):
     for attempt in range(1, max_attempts + 1):
         ua = random.choice(USER_AGENTS)
         try:
@@ -39,23 +40,54 @@ def request_with_retry(url, max_attempts=3):
                     "Referer": "https://www.brvm.org/fr/",
                 },
                 verify=False,
-                timeout=30,
+                timeout=90,
             )
             if resp.status_code == 200:
                 return resp
             if resp.status_code == 429:
-                wait = (2**attempt) * 5
-                print(
-                    f"  429 Too Many Requests — attente {wait}s (tentative {attempt}/{max_attempts})"
-                )
+                wait = (2**attempt) * 10
+                print(f"  429 Too Many Requests — attente {wait}s (tentative {attempt}/{max_attempts})")
                 time.sleep(wait)
                 continue
+            if resp.status_code >= 500:
+                wait = (2**attempt) * 5
+                print(f"  {resp.status_code} Erreur serveur — attente {wait}s (tentative {attempt}/{max_attempts})")
+                time.sleep(wait)
+                continue
+        except requests.ConnectionError as e:
+            wait = (2**attempt) * 3
+            print(f"  Connexion échouée — attente {wait}s (tentative {attempt}/{max_attempts}): {e}")
+            time.sleep(wait)
+        except requests.Timeout:
+            wait = (2**attempt) * 3
+            print(f"  Timeout — attente {wait}s (tentative {attempt}/{max_attempts})")
+            time.sleep(wait)
         except requests.RequestException as e:
             print(f"  Tentative {attempt}/{max_attempts} — {e}")
-        if attempt < max_attempts:
-            print(f"  Tentative {attempt}/{max_attempts} échouée, nouvelle tentative...")
-            time.sleep(5)
+            if attempt < max_attempts:
+                time.sleep(5)
     return None
+
+
+def save_failed_scrape(error_msg):
+    failed_file = LOG_DIR / "_failed_scrapes.json"
+    entry = {
+        "timestamp": datetime.now().isoformat(),
+        "error": str(error_msg),
+    }
+    try:
+        if failed_file.exists():
+            with open(failed_file, "r") as f:
+                data = json.load(f)
+        else:
+            data = []
+        data.append(entry)
+        if len(data) > 50:
+            data = data[-50:]
+        with open(failed_file, "w") as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass
 
 
 def scrape_brvm():
@@ -63,6 +95,7 @@ def scrape_brvm():
     resp = request_with_retry(url)
 
     if resp is None:
+        save_failed_scrape("Échec après 7 tentatives de connexion")
         raise RuntimeError("Échec après plusieurs tentatives")
 
     soup = BeautifulSoup(resp.text, "html.parser")
@@ -80,8 +113,14 @@ def scrape_brvm():
         if count > best_count:
             best_count = count
             stock_table = table
+
     if stock_table is None:
+        save_failed_scrape("Tableau introuvable — structure HTML changée")
         raise RuntimeError("Tableau des actions introuvable — la structure HTML a peut-être changé")
+
+    if best_count < 5:
+        save_failed_scrape(f"Seulement {best_count} actions trouvées — données suspectes")
+        raise RuntimeError(f"Seulement {best_count} actions trouvées — données suspectes")
 
     rows = stock_table.find_all("tr")
 
@@ -135,7 +174,12 @@ def scrape_brvm():
             print(f"  Ligne ignorée: {reason}")
 
     if not records:
+        save_failed_scrape("Aucune donnée valide extraite")
         raise RuntimeError("Aucune donnée valide extraite")
+
+    if len(records) < 10:
+        save_failed_scrape(f"Seulement {len(records)} actions récupérées — données incomplètes")
+        print(f"  ATTENTION: Seulement {len(records)} actions récupérées")
 
     df = pd.DataFrame(records)
     df.scrape_time = scrape_time
@@ -188,29 +232,38 @@ def main():
         return
 
     print("=== Snapshot BRVM ===")
-    print(f"Date: {datetime.now().date()}\n")
+    print(f"Date: {datetime.now().date()}")
+    print(f"Heure UTC: {now_utc.strftime('%H:%M:%S')}\n")
 
-    try:
-        df = scrape_brvm()
-        scrape_time = df.scrape_time
+    max_retries = 2
+    for attempt in range(1, max_retries + 1):
+        try:
+            df = scrape_brvm()
+            scrape_time = df.scrape_time
 
-        print(f"  {len(df)} actions récupérées à {scrape_time}\n")
+            print(f"  {len(df)} actions récupérées à {scrape_time}\n")
 
-        success = 0
-        for _, row in df.iterrows():
-            print(
-                f"  {row['Ticker']:<5} → Cours: {row['Cours_Cloture']:>8.0f} FCFA | Vol: {row['Volume']:,.0f}"
-            )
-            success += 1
+            success = 0
+            for _, row in df.iterrows():
+                print(
+                    f"  {row['Ticker']:<5} → Cours: {row['Cours_Cloture']:>8.0f} FCFA | Vol: {row['Volume']:,.0f}"
+                )
+                success += 1
 
-        append_intraday(df)
-        log_scrape(success, len(df) - success, scrape_time)
-        print(f"\n  Snapshot sauvegardé dans {INTRADAY_DIR}/")
+            append_intraday(df)
+            log_scrape(success, len(df) - success, scrape_time)
+            print(f"\n  Snapshot sauvegardé dans {INTRADAY_DIR}/")
+            return
 
-    except Exception as e:
-        print(f"\nERREUR: {e}")
-        log_scrape(0, 1, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        raise
+        except Exception as e:
+            print(f"\nERREUR (tentative {attempt}/{max_retries}): {e}")
+            if attempt < max_retries:
+                wait = 30 * attempt
+                print(f"  Nouvelle tentative dans {wait}s...")
+                time.sleep(wait)
+            else:
+                log_scrape(0, 1, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                raise
 
 
 if __name__ == "__main__":

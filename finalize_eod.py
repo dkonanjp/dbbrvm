@@ -9,7 +9,7 @@ INTRADAY_DIR = Path("dbintraday")
 
 FIRST_SNAPSHOT_HOUR = 9
 FIRST_SNAPSHOT_MIN = 50
-MIN_SNAPSHOTS = 3
+MIN_SNAPSHOTS = 2
 
 
 def _after_market_open(ts: str) -> bool:

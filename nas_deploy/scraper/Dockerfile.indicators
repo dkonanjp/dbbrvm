@@ -1,0 +1,2 @@
+FROM brvm-scraper:latest
+COPY indicators_incr.py /tmp/indicators_incr.py

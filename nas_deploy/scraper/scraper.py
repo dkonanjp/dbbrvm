@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 import schedule
 import urllib3
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureWarning)
+urllib3.disable_warnings(urllib3.exceptions.SecurityWarning)
 
 # Configuration
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://brvm_bot:BrvmSecure2026!@localhost:5433/brvm")
@@ -149,6 +149,24 @@ def insert_market_data(conn, records):
     conn.commit()
 
 
+def update_daily(conn):
+    with conn.cursor() as cur:
+        cur.execute("""
+            INSERT INTO daily (ticker, date, open, high, low, close, volume, variation)
+            SELECT DISTINCT ON (ticker)
+                ticker, date, open, high, low, close, volume, variation
+            FROM market_data
+            WHERE date = CURRENT_DATE
+            ORDER BY ticker, timestamp DESC
+            ON CONFLICT (ticker, date) DO UPDATE SET
+                open = EXCLUDED.open, high = EXCLUDED.high, low = EXCLUDED.low,
+                close = EXCLUDED.close, volume = EXCLUDED.volume, variation = EXCLUDED.variation
+        """)
+        count = cur.rowcount
+    conn.commit()
+    return count
+
+
 def log_scrape(conn, status, tickers_count, errors_count, duration_ms):
     with conn.cursor() as cur:
         cur.execute("""
@@ -169,9 +187,10 @@ def job():
     try:
         records = scrape_brvm()
         insert_market_data(conn, records)
+        daily_count = update_daily(conn)
         duration = int((time.time() - start) * 1000)
         log_scrape(conn, "success", len(records), 0, duration)
-        print(f"  ✓ {len(records)} actions collectées ({duration}ms)")
+        print(f"  ✓ {len(records)} actions collectées ({duration}ms) | daily: {daily_count} mis à jour")
     except Exception as e:
         duration = int((time.time() - start) * 1000)
         log_scrape(conn, "error", 0, 1, duration)

@@ -1,0 +1,113 @@
+version: "3.8"
+
+services:
+  brvm-postgres:
+    image: postgres:16-alpine
+    container_name: brvm-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-brvm}
+      POSTGRES_USER: ${DB_USER:-brvm_bot}
+      POSTGRES_PASSWORD: ${DB_PASS:-BrvmSecure2026!}
+    ports:
+      - "${PG_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    networks:
+      - brvm-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-brvm_bot} -d ${DB_NAME:-brvm}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  brvm-redis:
+    image: redis:7-alpine
+    container_name: brvm-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6380}:6379"
+    networks:
+      - brvm-network
+
+  brvm-scraper:
+    build:
+      context: ./scraper
+      dockerfile: Dockerfile
+    container_name: brvm-scraper
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: "postgresql://${DB_USER:-brvm_bot}:${DB_PASS:-BrvmSecure2026!}@brvm-postgres:5432/${DB_NAME:-brvm}"
+    depends_on:
+      brvm-postgres:
+        condition: service_healthy
+    networks:
+      - brvm-network
+
+  brvm-indicators:
+    build:
+      context: ./scraper
+      dockerfile: Dockerfile
+    container_name: brvm-indicators
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: "postgresql://${DB_USER:-brvm_bot}:${DB_PASS:-BrvmSecure2026!}@brvm-postgres:5432/${DB_NAME:-brvm}"
+    volumes:
+      - ./scraper/indicators_incr.py:/tmp/indicators_incr.py:ro
+    command: >
+      bash -c "python -u /tmp/indicators_incr.py && while true; do sleep 21600; python -u /tmp/indicators_incr.py; done"
+    depends_on:
+      brvm-postgres:
+        condition: service_healthy
+    networks:
+      - brvm-network
+
+  brvm-api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: brvm-api
+    restart: unless-stopped
+    environment:
+      DB_HOST: brvm-postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-brvm}
+      DB_USER: ${DB_USER:-brvm_bot}
+      DB_PASS: ${DB_PASS:-BrvmSecure2026!}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on:
+      brvm-postgres:
+        condition: service_healthy
+    networks:
+      - brvm-network
+
+  brvm-grafana:
+    image: grafana/grafana:latest
+    container_name: brvm-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/brvm-dashboard.json
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      brvm-postgres:
+        condition: service_healthy
+    networks:
+      - brvm-network
+
+volumes:
+  pgdata:
+  grafana_data:
+
+networks:
+  brvm-network:
+    driver: bridge

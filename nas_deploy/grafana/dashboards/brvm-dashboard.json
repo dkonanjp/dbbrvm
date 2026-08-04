@@ -1,0 +1,944 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "title": "Vue d'ensemble du marche BRVM",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#73BF69", "value": null },
+              { "color": "#FF9830", "value": 40 },
+              { "color": "#F2495C", "value": 45 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 1 },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "title": "Actions",
+      "type": "stat",
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(DISTINCT ticker) as value FROM daily;",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#73BF69", "value": null },
+              { "color": "#FF9830", "value": 100000 },
+              { "color": "#F2495C", "value": 200000 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 5, "x": 4, "y": 1 },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "title": "Jours de trading",
+      "type": "stat",
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(DISTINCT date) as value FROM daily;",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#8AB8FF", "value": null }
+            ]
+          },
+          "unit": "date",
+          "date": { "dateFormat": "DD/MM/YYYY" }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 5, "x": 9, "y": 1 },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "title": "Premiere cotation",
+      "type": "stat",
+      "targets": [
+        {
+          "rawSql": "SELECT MIN(date) as value FROM daily;",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#73BF69", "value": null }
+            ]
+          },
+          "unit": "date",
+          "date": { "dateFormat": "DD/MM/YYYY" }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 5, "x": 14, "y": 1 },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "title": "Derniere cotation",
+      "type": "stat",
+      "targets": [
+        {
+          "rawSql": "SELECT MAX(date) as value FROM daily;",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#73BF69", "value": null },
+              { "color": "#FF9830", "value": 50000 },
+              { "color": "#F2495C", "value": 100000 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 5, "x": 19, "y": 1 },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "title": "Snapshots intraday",
+      "type": "stat",
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(*) as value FROM market_data;",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 },
+      "id": 101,
+      "title": "Mouvements du jour - Gagnants & Perdants",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": {
+            "align": "auto",
+            "cellOptions": { "type": "auto" },
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 0 },
+              { "color": "green", "value": 0.01 }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Variation %" },
+            "properties": [
+              { "id": "unit", "value": "percent" },
+              { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "gauge" } },
+              { "id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "#F2495C", "value": null },
+                  { "color": "#FF9830", "value": -5 },
+                  { "color": "#73BF69", "value": 0 },
+                  { "color": "#73BF69", "value": 5 }
+                ]
+              }}
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Dernier prix" },
+            "properties": [
+              { "id": "unit", "value": "currency" },
+              { "id": "unit", "value": "none" },
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Volume" },
+            "properties": [
+              { "id": "unit", "value": "short" },
+              { "id": "custom.cellOptions", "value": { "type": "color-background" } },
+              { "id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "transparent", "value": null },
+                  { "color": "#73BF69", "value": 5000 },
+                  { "color": "#FF9830", "value": 20000 },
+                  { "color": "#F2495C", "value": 50000 }
+                ]
+              }}
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 12, "w": 12, "x": 0, "y": 7 },
+      "id": 10,
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": { "show": false }
+      },
+      "title": "Top Gagnants du jour",
+      "type": "table",
+      "targets": [
+        {
+          "rawSql": "WITH latest AS (\n  SELECT ticker, date, close, volume, LAG(close) OVER (PARTITION BY ticker ORDER BY date) as prev_close\n  FROM daily\n  WHERE date = (SELECT MAX(date) FROM daily)\n)\nSELECT ticker as \"Action\",\n       close as \"Dernier prix\",\n       ROUND(((close - prev_close) / NULLIF(prev_close, 0) * 100)::numeric, 2) as \"Variation %\",\n       volume as \"Volume\"\nFROM latest\nWHERE prev_close IS NOT NULL\nORDER BY \"Variation %\" DESC\nLIMIT 10;",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": {
+            "align": "auto",
+            "cellOptions": { "type": "auto" },
+            "inspect": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 0 },
+              { "color": "red", "value": 0.01 }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Variation %" },
+            "properties": [
+              { "id": "unit", "value": "percent" },
+              { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "gauge" } },
+              { "id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "#F2495C", "value": null },
+                  { "color": "#FF9830", "value": -5 },
+                  { "color": "#73BF69", "value": 0 },
+                  { "color": "#73BF69", "value": 5 }
+                ]
+              }}
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Dernier prix" },
+            "properties": [
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Volume" },
+            "properties": [
+              { "id": "unit", "value": "short" },
+              { "id": "custom.cellOptions", "value": { "type": "color-background" } },
+              { "id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "transparent", "value": null },
+                  { "color": "#73BF69", "value": 5000 },
+                  { "color": "#FF9830", "value": 20000 },
+                  { "color": "#F2495C", "value": 50000 }
+                ]
+              }}
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 12, "w": 12, "x": 12, "y": 7 },
+      "id": 11,
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": { "show": false }
+      },
+      "title": "Top Perdants du jour",
+      "type": "table",
+      "targets": [
+        {
+          "rawSql": "WITH latest AS (\n  SELECT ticker, date, close, volume, LAG(close) OVER (PARTITION BY ticker ORDER BY date) as prev_close\n  FROM daily\n  WHERE date = (SELECT MAX(date) FROM daily)\n)\nSELECT ticker as \"Action\",\n       close as \"Dernier prix\",\n       ROUND(((close - prev_close) / NULLIF(prev_close, 0) * 100)::numeric, 2) as \"Variation %\",\n       volume as \"Volume\"\nFROM latest\nWHERE prev_close IS NOT NULL\nORDER BY \"Variation %\" ASC\nLIMIT 10;",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 19 },
+      "id": 102,
+      "title": "Toutes les actions - Tableau de bord",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": {
+            "align": "auto",
+            "cellOptions": { "type": "auto" },
+            "inspect": false
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Variation %" },
+            "properties": [
+              { "id": "unit", "value": "percent" },
+              { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "gauge" } },
+              { "id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "#F2495C", "value": null },
+                  { "color": "#FF9830", "value": -3 },
+                  { "color": "transparent", "value": -0.5 },
+                  { "color": "transparent", "value": 0.5 },
+                  { "color": "#FF9830", "value": 3 },
+                  { "color": "#73BF69", "value": 5 }
+                ]
+              }}
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Volume" },
+            "properties": [
+              { "id": "unit", "value": "short" },
+              { "id": "custom.cellOptions", "value": { "type": "color-background" } },
+              { "id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "transparent", "value": null },
+                  { "color": "#73BF69", "value": 5000 },
+                  { "color": "#FF9830", "value": 20000 },
+                  { "color": "#F2495C", "value": 50000 }
+                ]
+              }}
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Dernier prix" },
+            "properties": [
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Date" },
+            "properties": [
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 18, "w": 24, "x": 0, "y": 20 },
+      "id": 20,
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": { "show": false },
+        "sortBy": [{ "displayName": "Variation %", "desc": true }]
+      },
+      "title": "Toutes les actions - Derniere journee",
+      "type": "table",
+      "targets": [
+        {
+          "rawSql": "WITH latest AS (\n  SELECT ticker, date, open, high, low, close, volume,\n         LAG(close) OVER (PARTITION BY ticker ORDER BY date) as prev_close,\n         ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date DESC) as rn\n  FROM daily\n)\nSELECT ticker as \"Action\",\n       date as \"Date\",\n       open as \"Ouverture\",\n       high as \"Plus haut\",\n       low as \"Plus bas\",\n       close as \"Dernier prix\",\n       volume as \"Volume\",\n       ROUND(((close - prev_close) / NULLIF(prev_close, 0) * 100)::numeric, 2) as \"Variation %\"\nFROM latest\nWHERE rn = 1 AND prev_close IS NOT NULL\nORDER BY \"Variation %\" DESC;",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 38 },
+      "id": 103,
+      "title": "Analyse par action",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": { "group": "A", "mode": "none" },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 80 }
+            ]
+          },
+          "unit": "currency",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 12, "w": 16, "x": 0, "y": 39 },
+      "id": 30,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "min", "max"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "title": "Evolution des prix - 30 derniers jours",
+      "type": "timeseries",
+      "targets": [
+        {
+          "rawSql": "WITH ranked AS (\n  SELECT ticker, date, close,\n         ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date DESC) as rn\n  FROM daily\n  WHERE date >= (SELECT MAX(date) - INTERVAL '30 days' FROM daily)\n)\nSELECT date as \"time\",\n       ticker as \"metric\",\n       close as \"Prix\"\nFROM ranked\nWHERE rn <= 30\nORDER BY date;",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "scheme",
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "insertNulls": false,
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": { "group": "A", "mode": "normal" },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 80 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 12, "w": 8, "x": 16, "y": 39 },
+      "id": 31,
+      "options": {
+        "legend": { "calcs": ["sum"], "displayMode": "table", "placement": "right" },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "title": "Volume par action - 30 derniers jours",
+      "type": "timeseries",
+      "targets": [
+        {
+          "rawSql": "SELECT date as \"time\",\n       ticker as \"metric\",\n       volume as \"Volume\"\nFROM daily\nWHERE date >= (SELECT MAX(date) - INTERVAL '30 days' FROM daily)\nORDER BY date;",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 51 },
+      "id": 104,
+      "title": "Details d'une action",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "description": "Sélectionnez une action pour voir les détails",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "allValue": null,
+            "binary": false,
+            "includeAll": false,
+            "multi": false,
+            "options": [],
+            "query": "SELECT DISTINCT ticker FROM daily ORDER BY ticker",
+            "queryValue": "ABJC",
+            "refresh": 2,
+            "regex": "",
+            "sort": 1,
+            "type": "query"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 3, "w": 6, "x": 0, "y": 52 },
+      "id": 40,
+      "options": {
+        "current": { "selected": false, "text": "ABJC", "value": "ABJC" },
+        "includeAll": false,
+        "multi": false,
+        "options": [],
+        "query": "",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      "title": "Choisir une action",
+      "type": "dashboard",
+      "targets": [
+        {
+          "rawSql": "SELECT DISTINCT ticker FROM daily ORDER BY ticker",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": true,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Prix",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "always",
+            "spanNulls": false,
+            "stacking": { "group": "A", "mode": "none" },
+            "thresholdsStyle": { "mode": "dashed" }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null }
+            ]
+          },
+          "unit": "currency",
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Plus haut" },
+            "properties": [
+              { "id": "color", "value": { "fixedColor": "#73BF69", "mode": "fixed" } },
+              { "id": "custom.lineStyle", "value": { "dash": [10, 10], "fill": "dash" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Plus bas" },
+            "properties": [
+              { "id": "color", "value": { "fixedColor": "#F2495C", "mode": "fixed" } },
+              { "id": "custom.lineStyle", "value": { "dash": [10, 10], "fill": "dash" } }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 10, "w": 18, "x": 6, "y": 52 },
+      "id": 41,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "min", "max", "mean"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "title": "Cours OHLC - 60 derniers jours",
+      "type": "timeseries",
+      "targets": [
+        {
+          "rawSql": "SELECT date as \"time\",\n       open as \"Ouverture\",\n       high as \"Plus haut\",\n       low as \"Plus bas\",\n       close as \"Cloture\"\nFROM daily\nWHERE ticker = '$ticker'\n  AND date >= (SELECT MAX(date) - INTERVAL '60 days' FROM daily)\nORDER BY date;",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "scheme",
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "insertNulls": false,
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": { "group": "A", "mode": "none" },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 80 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 62 },
+      "id": 42,
+      "options": {
+        "legend": { "calcs": ["sum", "mean"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "title": "Volume - 60 derniers jours",
+      "type": "timeseries",
+      "targets": [
+        {
+          "rawSql": "SELECT date as \"time\",\n       volume as \"Volume\"\nFROM daily\nWHERE ticker = '$ticker'\n  AND date >= (SELECT MAX(date) - INTERVAL '60 days' FROM daily)\nORDER BY date;",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 72 },
+      "id": 105,
+      "title": "Activite intraday",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": { "group": "A", "mode": "none" },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null }
+            ]
+          },
+          "unit": "currency"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 73 },
+      "id": 50,
+      "options": {
+        "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "title": "Prix intraday - Aujourd'hui",
+      "type": "timeseries",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp as \"time\",\n       ticker as \"metric\",\n       close as \"Prix\"\nFROM market_data\nWHERE date = (SELECT MAX(date) FROM market_data)\nORDER BY timestamp;",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "scheme",
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "insertNulls": false,
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": { "group": "A", "mode": "normal" },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 73 },
+      "id": 51,
+      "options": {
+        "legend": { "calcs": ["sum"], "displayMode": "table", "placement": "right" },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "title": "Volume cumule intraday - Aujourd'hui",
+      "type": "timeseries",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp as \"time\",\n       ticker as \"metric\",\n       volume as \"Volume\"\nFROM market_data\nWHERE date = (SELECT MAX(date) FROM market_data)\nORDER BY timestamp;",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 83 },
+      "id": 106,
+      "title": "Distribution & Statistiques",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "lineWidth": 2,
+            "fillOpacity": 30
+          },
+          "mappings": [],
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 84 },
+      "id": 60,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "title": "Distribution des variations",
+      "type": "histogram",
+      "targets": [
+        {
+          "rawSql": "WITH latest AS (\n  SELECT ticker, close, LAG(close) OVER (PARTITION BY ticker ORDER BY date) as prev_close\n  FROM daily\n  WHERE date >= (SELECT MAX(date) - INTERVAL '30 days' FROM daily)\n)\nSELECT ROUND(((close - prev_close) / NULLIF(prev_close, 0) * 100)::numeric, 1) as \"Variation %\"\nFROM latest\nWHERE prev_close IS NOT NULL;",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "lineWidth": 2,
+            "fillOpacity": 30
+          },
+          "mappings": [],
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 84 },
+      "id": 61,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "title": "Distribution des volumes",
+      "type": "histogram",
+      "targets": [
+        {
+          "rawSql": "SELECT volume as \"Volume\"\nFROM daily\nWHERE date >= (SELECT MAX(date) - INTERVAL '30 days' FROM daily)\n  AND volume > 0;",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["BRVM", "Bourse", "Finance", "Cote d'Ivoire"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": false, "text": "ABJC", "value": "ABJC" },
+        "datasource": { "type": "postgres", "uid": "PAC7984302B1484E9" },
+        "definition": "SELECT DISTINCT ticker FROM daily ORDER BY ticker",
+        "includeAll": false,
+        "multi": false,
+        "name": "ticker",
+        "options": [],
+        "query": "SELECT DISTINCT ticker FROM daily ORDER BY ticker",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": { "from": "now-30d", "to": "now" },
+  "timepicker": {},
+  "timezone": "Africa/Abidjan",
+  "title": "BRVM - Tableau de bord boursier",
+  "uid": "brvm-main-dashboard",
+  "version": 1
+}
